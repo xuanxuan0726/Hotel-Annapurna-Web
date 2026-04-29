@@ -9,12 +9,12 @@ function getMailer() {
 
     // Gmail SMTP
     $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';
+    $mail->Host       = 'smtp.mailtrap.io';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'thebcatu@gmail.com';
-    $mail->Password   = 'bocvhrfpnksedtvw';  
+    $mail->Username   = '9f6ca7e7801a85';
+    $mail->Password   = '111029d84a124f';  
     $mail->SMTPSecure = 'tls';
-    $mail->Port       = 587;
+    $mail->Port       = 2525;
 
     $mail->setFrom('thebcatu@gmail.com', 'Annapurna Hotel - No Reply');
 
@@ -27,12 +27,12 @@ function sendMail($to, $subject, $body, $from = 'thebcatu@gmail.com', $fromName 
     try {
         // Gmail SMTP
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
+        $mail->Host       = 'smtp.mailtrap.io';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'thebcatu@gmail.com';
-        $mail->Password   = 'bocvhrfpnksedtvw';
+        $mail->Username   = '9f6ca7e7801a85';
+        $mail->Password   = '111029d84a124f';  
         $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
+        $mail->Port       = 2525;
 
         // Sender
         $mail->setFrom($from, $fromName);
