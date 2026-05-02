@@ -9,34 +9,45 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 $serverUrl = 'http://localhost:4444';
 $driver = RemoteWebDriver::create($serverUrl, DesiredCapabilities::chrome());
 
-try {
-    // 1. Navigate to your login page
+function runLoginTest($driver, $email, $password, $scenarioName) {
+    echo "\n--- Testing Scenario: $scenarioName ---\n";
     $driver->get('http://localhost/Hotel-Annapurna-Web/login.php');
-    echo "Verification Started: Testing Login Page...\n";
 
-    // 2. Identify and interact with elements from your login.php
-    // Entering Email
-    $driver->findElement(WebDriverBy::id('email'))->sendKeys('customer@example.com');
+    // Enter Credentials
+    $driver->findElement(WebDriverBy::id('email'))->clear()->sendKeys($email);
+    $driver->findElement(WebDriverBy::id('password'))->clear()->sendKeys($password);
     
-    // Entering Password
-    $driver->findElement(WebDriverBy::id('password'))->sendKeys('password123');
-    
-    // Clicking the "Sign In" button (using its class name)
+    // Submit
     $driver->findElement(WebDriverBy::className('login-button'))->click();
+    sleep(2); // Wait for PHP to process
+}
 
-    // 3. Verify Success: Check if we redirected away from login.php
-    // We wait up to 10 seconds for the URL to change to index.php
+try {
+    // 1. SCENARIO: WRONG EMAIL (Negative Test)
+    runLoginTest($driver, 'hacker@wrong.com', 'anypassword', 'Invalid Email');
+    if (strpos($driver->getCurrentURL(), 'login.php') !== false) {
+        echo "✅ Success: System correctly blocked invalid email.\n";
+    }
+
+    // 2. SCENARIO: WRONG PASSWORD (Negative Test)
+    // Note: Use an email that actually exists in your database
+    runLoginTest($driver, 'customer@example.com', 'wrongpassword', 'Invalid Password');
+    if (strpos($driver->getCurrentURL(), 'login.php') !== false) {
+        echo "✅ Success: System correctly blocked wrong password.\n";
+    }
+
+    // 3. SCENARIO: CORRECT LOGIN (Positive Test)
+    runLoginTest($driver, 'xuanxuanteoh26@gmail.com', 'Abc1234*', 'Valid Login');
+    
+    // Verification: Wait for redirect to home page
     $driver->wait(10)->until(
         WebDriverExpectedCondition::urlContains('index.php')
     );
-
-    echo "✅ Success: System authenticated user and redirected to Home Page.\n";
-    echo "Final URL: " . $driver->getCurrentURL() . "\n";
+    echo "✅ Success: Correct login redirected to Home Page!\n";
 
 } catch (Exception $e) {
-    echo "❌ Test Failed: " . $e->getMessage() . "\n";
+    echo "❌ Test Encountered an Error: " . $e->getMessage() . "\n";
 } finally {
-    // Close the automated browser
     $driver->quit();
 }
 ?>
