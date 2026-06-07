@@ -1,12 +1,12 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$dbname = "hotel_annapurna_db";
+$host = "localhost";        // Database host (localhost for local)
+$username = "root";         // Default XAMPP username
+$password = "";             // Leave empty for default XAMPP
+$database = "hotel_annapurna"; // Database name
 
-$conn = mysqli_connect($host, $user, $pass, $dbname);
-
-if (!$conn) {
-    die("<h3 style='color:red;'>❌ Database Connection Failed: " . mysqli_connect_error() . "</h3>");
+// Connection
+$conn = new mysqli($host, $username, $password, $database);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>
