@@ -1,0 +1,23 @@
+{
+  "name": "hotel-annapurna-web",
+  "version": "1.0.0",
+  "description": "> ⚠️ **Important:** These are FREE hosting URLs with limitations. **Not recommended for production data.**\r > For testing: Use the credentials below or register with a **Gmail account only** (Gmail SMTP is configured)",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuanxuan0726/Hotel-Annapurna-Web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/xuanxuan0726/Hotel-Annapurna-Web/issues"
+  },
+  "homepage": "https://github.com/xuanxuan0726/Hotel-Annapurna-Web#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.2"
+  }
+}

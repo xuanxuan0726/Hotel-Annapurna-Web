@@ -11,17 +11,17 @@ function getMailer() {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'thebcatu@gmail.com';
-    $mail->Password   = 'bocvhrfpnksedtvw';  
-    $mail->SMTPSecure = 'tls';
+    $mail->Username   = 'jeyang326@gmail.com';
+    $mail->Password   = 'rihvondsmybwevuz';  
+    $mail->SMTPSecure = 'PHPMailer::ENCRYPTION_STARTTLS;';
     $mail->Port       = 587;
 
-    $mail->setFrom('thebcatu@gmail.com', 'Annapurna Hotel - No Reply');
+    $mail->setFrom('jeyang326@gmail.com', 'Annapurna Hotel - No Reply');
 
     return $mail;
 }
 
-function sendMail($to, $subject, $body, $from = 'thebcatu@gmail.com', $fromName = 'Annapurna Hotel - No Reply') {
+function sendMail($to, $subject, $body, $from = 'jeyang326@gmail.com', $fromName = 'Annapurna Hotel - No Reply') {
     $mail = new PHPMailer(true);
 
     try {
@@ -29,9 +29,9 @@ function sendMail($to, $subject, $body, $from = 'thebcatu@gmail.com', $fromName 
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'thebcatu@gmail.com';
-        $mail->Password   = 'bocvhrfpnksedtvw';
-        $mail->SMTPSecure = 'tls';
+        $mail->Username   = 'jeyang326@gmail.com';
+        $mail->Password   = 'rihvondsmybwevuz';
+        $mail->SMTPSecure = 'PHPMailer::ENCRYPTION_STARTTLS;';
         $mail->Port       = 587;
 
         // Sender
