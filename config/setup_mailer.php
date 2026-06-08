@@ -9,30 +9,30 @@ function getMailer() {
 
     // Gmail SMTP
     $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';
+    $mail->Host       = 'sandbox.smtp.mailtrap.io';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'jeyang326@gmail.com';
-    $mail->Password   = 'rihvondsmybwevuz';  
-    $mail->SMTPSecure = 'PHPMailer::ENCRYPTION_STARTTLS;';
-    $mail->Port       = 587;
+    $mail->Username   = '3c890cf3d50f43';
+    $mail->Password   = '87a2191e20028d';  
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 2525;
 
-    $mail->setFrom('jeyang326@gmail.com', 'Annapurna Hotel - No Reply');
+    $mail->setFrom('noreply@annapurna.test', 'Annapurna Hotel - No Reply');
 
     return $mail;
 }
 
-function sendMail($to, $subject, $body, $from = 'jeyang326@gmail.com', $fromName = 'Annapurna Hotel - No Reply') {
+function sendMail($to, $subject, $body, $from = 'noreply@annapurna.test', $fromName = 'Annapurna Hotel - No Reply') {
     $mail = new PHPMailer(true);
 
     try {
         // Gmail SMTP
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
+        $mail->Host       = 'smtp.mailtrap.io';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'jeyang326@gmail.com';
-        $mail->Password   = 'rihvondsmybwevuz';
-        $mail->SMTPSecure = 'PHPMailer::ENCRYPTION_STARTTLS;';
-        $mail->Port       = 587;
+        $mail->Username   = '3c890cf3d50f43';
+        $mail->Password   = '87a2191e20028d';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 2525;
 
         // Sender
         $mail->setFrom($from, $fromName);
