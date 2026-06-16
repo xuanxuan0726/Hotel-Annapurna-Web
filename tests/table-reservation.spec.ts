@@ -1,10 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F011 Table Reservation — TCOV-11-024 … 035 for api/create-booking.php (item_type='table').
+// F011 Table Reservation — TCOV-11-001 … 012 for api/create-booking.php (item_type='table').
 //
 // This endpoint is properly implemented, so these tests assert its real behavior. Reservation-
-// creating tests use a throwaway table and clean it up. The rollback test (035) forces the INSERT
+// creating tests use a throwaway table and clean it up. The rollback test (012) forces the INSERT
 // to fail via a foreign-key violation (the session's user is deleted, leaving orders.user_id
 // dangling).
 
@@ -49,7 +49,7 @@ const validForm = (id, table_no, check_in, check_out, price = '500') => ({
 
 test.describe('F011 Table Reservation', () => {
 
-  test('TCOV-11-024 — Table reservation is created successfully', async ({ page }) => {
+  test('TCOV-11-001 — Table reservation is created successfully', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const table = createTable();
     try {
@@ -63,7 +63,7 @@ test.describe('F011 Table Reservation', () => {
     }
   });
 
-  test('TCOV-11-025 — Reject reservation and require login', async ({ page }) => {
+  test('TCOV-11-002 — Reject reservation and require login', async ({ page }) => {
     const resp = await page.request.post(API, { form: validForm(1, 'x', '2099-01-01', '2099-01-02') });
     expect(resp.status()).toBe(401);
     const body = await resp.json();
@@ -71,7 +71,7 @@ test.describe('F011 Table Reservation', () => {
     expect(body.require_login).toBe(true);
   });
 
-  test('TCOV-11-026 — Reject invalid request method', async ({ page }) => {
+  test('TCOV-11-003 — Reject invalid request method', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const resp = await page.request.get(API);
     expect(resp.status()).toBe(405);
@@ -79,7 +79,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('Invalid request method');
   });
 
-  test('TCOV-11-027 — Reject incomplete reservation details', async ({ page }) => {
+  test('TCOV-11-004 — Reject incomplete reservation details', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-02');
     delete form.price;
@@ -89,7 +89,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('Missing required booking information');
   });
 
-  test('TCOV-11-028 — Reject invalid booking type', async ({ page }) => {
+  test('TCOV-11-005 — Reject invalid booking type', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-02');
     form.item_type = 'spaceship';
@@ -99,7 +99,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('Invalid booking type');
   });
 
-  test('TCOV-11-029 — Reject invalid table data format', async ({ page }) => {
+  test('TCOV-11-006 — Reject invalid table data format', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-02');
     form.item_data = 'this-is-not-json';
@@ -109,7 +109,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('Invalid item data format');
   });
 
-  test('TCOV-11-030 — Reject reservation when table does not exist', async ({ page }) => {
+  test('TCOV-11-007 — Reject reservation when table does not exist', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const resp = await page.request.post(API, { form: validForm(999999, 'x', '2099-01-01', '2099-01-02') });
     const body = await resp.json();
@@ -117,7 +117,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('Table not found');
   });
 
-  test('TCOV-11-031 — Reject reservation when table status is not available', async ({ page }) => {
+  test('TCOV-11-008 — Reject reservation when table status is not available', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const bookedId = sql(`SELECT id FROM tables WHERE booking_status='booked' LIMIT 1`);
     const resp = await page.request.post(API, { form: validForm(bookedId, 'x', '2099-01-01', '2099-01-02') });
@@ -126,7 +126,7 @@ test.describe('F011 Table Reservation', () => {
     expect(String(body.message)).toContain('not available');
   });
 
-  test('TCOV-11-032 — Calculate reservation price correctly', async ({ page }) => {
+  test('TCOV-11-009 — Calculate reservation price correctly', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const table = createTable();
     try {
@@ -140,7 +140,7 @@ test.describe('F011 Table Reservation', () => {
     }
   });
 
-  test('TCOV-11-033 — Generate reservation reference successfully', async ({ page }) => {
+  test('TCOV-11-010 — Generate reservation reference successfully', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const table = createTable();
     try {
@@ -154,7 +154,7 @@ test.describe('F011 Table Reservation', () => {
     }
   });
 
-  test('TCOV-11-034 — Update table status to reserved after successful reservation', async ({ page }) => {
+  test('TCOV-11-011 — Update table status to reserved after successful reservation', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const table = createTable();
     try {
@@ -167,7 +167,7 @@ test.describe('F011 Table Reservation', () => {
     }
   });
 
-  test('TCOV-11-035 — Roll back transaction and keep table status unchanged', async ({ page }) => {
+  test('TCOV-11-012 — Roll back transaction and keep table status unchanged', async ({ page }) => {
     // Force the INSERT to fail via a foreign-key violation: log in as a throwaway user, delete that
     // user (so the session's user_id no longer references a users row), then reserve. The
     // orders.user_id FK rejects the INSERT → the transaction rolls back: no order, table unchanged.

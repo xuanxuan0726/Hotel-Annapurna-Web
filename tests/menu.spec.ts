@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F006 Browse Food Menu — TCOV-06-024 … 033 for the public menu.php page.
+// F006 Browse Food Menu — TCOV-06-001 … 010 for the public menu.php page.
 //
 // menu.php server-renders three category tables (Vegetarian Delights / Non-Vegetarian
 // Specialties / Chef's Special) from food_items, with cumulative pagination (see-more/see-less
@@ -23,7 +23,7 @@ const rowsOf = (sectionLoc) => sectionLoc.locator('.menu-table tbody tr');
 
 test.describe('F006 Browse Food Menu', () => {
 
-  test('TCOV-06-024 — Browse Food Menu Main Flow', async ({ page }) => {
+  test('TCOV-06-001 — Browse Food Menu Main Flow', async ({ page }) => {
     await page.goto(MENU);
     await expect(page.locator('.menu-container')).toBeVisible();
     await expect(page.locator('.menu-section')).toHaveCount(3);
@@ -31,7 +31,7 @@ test.describe('F006 Browse Food Menu', () => {
     await expect(page.locator('.selected-items-container')).toBeVisible();
   });
 
-  test('TCOV-06-025 — No food item available', async ({ page }) => {
+  test('TCOV-06-002 — No food item available', async ({ page }) => {
     // The page has no empty-state UI, so simulate "no food" by briefly emptying the shared
     // food_items table — backed up and restored so no data is lost.
     sql('CREATE TABLE food_items_bak AS SELECT * FROM food_items');
@@ -47,21 +47,21 @@ test.describe('F006 Browse Food Menu', () => {
     }
   });
 
-  test('TCOV-06-026 — Browse vegetarian food items', async ({ page }) => {
+  test('TCOV-06-003 — Browse vegetarian food items', async ({ page }) => {
     await page.goto(MENU);
     const veg = section(page, 'Vegetarian Delights');
     await expect(veg).toBeVisible();
     expect(await rowsOf(veg).count()).toBeGreaterThan(0);
   });
 
-  test('TCOV-06-027 — Browse non-vegetarian food items', async ({ page }) => {
+  test('TCOV-06-004 — Browse non-vegetarian food items', async ({ page }) => {
     await page.goto(MENU);
     const nonveg = section(page, 'Non-Vegetarian Specialties');
     await expect(nonveg).toBeVisible();
     expect(await rowsOf(nonveg).count()).toBeGreaterThan(0);
   });
 
-  test('TCOV-06-028 — Browse chef’s special food items', async ({ page }) => {
+  test('TCOV-06-005 — Browse chef’s special food items', async ({ page }) => {
     await page.goto(MENU);
     const special = section(page, "Chef's Special");
     await expect(special).toBeVisible();
@@ -70,7 +70,7 @@ test.describe('F006 Browse Food Menu', () => {
     await expect(special.locator('th', { hasText: 'Available On' })).toBeVisible();
   });
 
-  test('TCOV-06-029 — Display more food items', async ({ page }) => {
+  test('TCOV-06-006 — Display more food items', async ({ page }) => {
     await page.goto(MENU);
     const veg = section(page, 'Vegetarian Delights');
     const before = await rowsOf(veg).count(); // 5 on page 1
@@ -79,7 +79,7 @@ test.describe('F006 Browse Food Menu', () => {
     expect(after).toBeGreaterThan(before);
   });
 
-  test('TCOV-06-030 — Display fewer food items', async ({ page }) => {
+  test('TCOV-06-007 — Display fewer food items', async ({ page }) => {
     await page.goto(`${MENU}?veg_page=2`); // 10 veg rows shown
     const veg = section(page, 'Vegetarian Delights');
     const before = await rowsOf(veg).count();
@@ -88,7 +88,7 @@ test.describe('F006 Browse Food Menu', () => {
     expect(after).toBeLessThan(before);
   });
 
-  test('TCOV-06-031 — Verify food details are displayed correctly', async ({ page }) => {
+  test('TCOV-06-008 — Verify food details are displayed correctly', async ({ page }) => {
     await page.goto(MENU);
     const firstRow = rowsOf(section(page, 'Vegetarian Delights')).first();
     const name = (await firstRow.locator('.menu-item-name').innerText()).trim();
@@ -99,7 +99,7 @@ test.describe('F006 Browse Food Menu', () => {
     expect(displayedPrice).toBe(expected);
   });
 
-  test('TCOV-06-032 — Verify selected item appears in selected items section', async ({ page }) => {
+  test('TCOV-06-009 — Verify selected item appears in selected items section', async ({ page }) => {
     await page.goto(MENU);
     const firstRow = rowsOf(section(page, 'Vegetarian Delights')).first();
     const name = (await firstRow.locator('.menu-item-name').innerText()).trim();
@@ -109,7 +109,7 @@ test.describe('F006 Browse Food Menu', () => {
     await expect(selected.locator('.menu-item-name')).toHaveText(name);
   });
 
-  test('TCOV-06-033 — Verify total price updates after item selection', async ({ page }) => {
+  test('TCOV-06-010 — Verify total price updates after item selection', async ({ page }) => {
     await page.goto(MENU);
     await expect(page.locator('#menu-total-price')).toHaveText('RS 0.00');
     const firstRow = rowsOf(section(page, 'Vegetarian Delights')).first();

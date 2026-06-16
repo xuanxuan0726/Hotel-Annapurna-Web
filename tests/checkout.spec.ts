@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F012 Cart Checkout — TCOV-12-010 … 016.
+// F012 Cart Checkout — TCOV-12-001 … 007.
 //
 // Per the user's directive, each test asserts the behavior that SHOULD exist; where the app
 // doesn't implement it, the test is left to FAIL (red) to surface the gap.
@@ -50,7 +50,7 @@ function cleanupOrders(body) {
 
 test.describe('F012 Cart Checkout', () => {
 
-  test('TCOV-12-010 — Verify checkout is rejected when user is not logged in', async ({ page }) => {
+  test('TCOV-12-001 — Verify checkout is rejected when user is not logged in', async ({ page }) => {
     // No login → the order API rejects with 401.
     const resp = await page.request.post(API_ORDER, { data: foodOrder([{ id: 1, quantity: 1, price: 100, food_name: 'Test' }]) });
     expect(resp.status()).toBe(401);
@@ -58,7 +58,7 @@ test.describe('F012 Cart Checkout', () => {
     expect(body.success).toBe(false);
   });
 
-  test('TCOV-12-011 — Verify checkout is rejected when cart is empty', async ({ page }) => {
+  test('TCOV-12-002 — Verify checkout is rejected when cart is empty', async ({ page }) => {
     let dialog = '';
     page.on('dialog', (d) => { dialog = d.message(); d.accept(); });
     await page.goto(CART); // fresh context → empty localStorage cart
@@ -66,7 +66,7 @@ test.describe('F012 Cart Checkout', () => {
     expect(dialog).toContain('Your cart is empty');
   });
 
-  test('TCOV-12-012 — Verify checkout is rejected when cart contains invalid item data', async ({ page }) => {
+  test('TCOV-12-003 — Verify checkout is rejected when cart contains invalid item data', async ({ page }) => {
     // SHOULD: a food item with no/garbage id is invalid and the checkout is rejected. ACTUAL: the
     // API does not validate food item data — it creates the order with item_id=0 (and even leaks a
     // PHP "Undefined array key 'id'" warning into the response). Fails by design.
@@ -82,7 +82,7 @@ test.describe('F012 Cart Checkout', () => {
     }
   });
 
-  test('TCOV-12-013 — Verify checkout is rejected when selected item is unavailable', async ({ page }) => {
+  test('TCOV-12-004 — Verify checkout is rejected when selected item is unavailable', async ({ page }) => {
     await login(page);
     const bookedRoom = sql(`SELECT id FROM rooms WHERE status='booked' LIMIT 1`);
     const payload = {
@@ -95,14 +95,14 @@ test.describe('F012 Cart Checkout', () => {
     expect(String(body.message)).toContain('not available');
   });
 
-  test('TCOV-12-014 — Verify invalid coupon is rejected during checkout', async ({ page }) => {
+  test('TCOV-12-005 — Verify invalid coupon is rejected during checkout', async ({ page }) => {
     const resp = await page.request.post(API_COUPON, { data: { code: 'NOTAREALCODE123', subtotal: 1000 } });
     const body = await resp.json();
     expect(body.success).toBe(false);
     expect(String(body.message)).toContain('Invalid coupon code');
   });
 
-  test('TCOV-12-015 — Verify checkout is rejected when payment method is not selected', async ({ page }) => {
+  test('TCOV-12-006 — Verify checkout is rejected when payment method is not selected', async ({ page }) => {
     // SHOULD: checkout without a chosen payment method is rejected. ACTUAL: the API defaults a
     // missing payment_method to 'cash' and proceeds. Fails by design.
     await login(page);
@@ -117,7 +117,7 @@ test.describe('F012 Cart Checkout', () => {
     }
   });
 
-  test('TCOV-12-016 — Verify checkout is successful when all conditions are valid', async ({ page }) => {
+  test('TCOV-12-007 — Verify checkout is successful when all conditions are valid', async ({ page }) => {
     await login(page);
     const resp = await page.request.post(API_ORDER, { data: foodOrder([{ id: 1, quantity: 1, price: 100, food_name: 'Test' }]) });
     const body = await resp.json();

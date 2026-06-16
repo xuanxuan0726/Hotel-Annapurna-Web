@@ -11,8 +11,8 @@ function getMailer() {
     $mail->isSMTP();
     $mail->Host       = 'sandbox.smtp.mailtrap.io';
     $mail->SMTPAuth   = true;
-    $mail->Username   = '3c890cf3d50f43';
-    $mail->Password   = '87a2191e20028d';  
+    $mail->Username   = 'e20ccdb2df0e67';
+    $mail->Password   = '661615619aba9a';  
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 2525;
 
@@ -29,8 +29,8 @@ function sendMail($to, $subject, $body, $from = 'noreply@annapurna.test', $fromN
         $mail->isSMTP();
         $mail->Host       = 'smtp.mailtrap.io';
         $mail->SMTPAuth   = true;
-        $mail->Username   = '3c890cf3d50f43';
-        $mail->Password   = '87a2191e20028d';
+        $mail->Username   = 'e20ccdb2df0e67';
+        $mail->Password   = '661615619aba9a';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 2525;
 

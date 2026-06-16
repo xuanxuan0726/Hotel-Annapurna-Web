@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F008 Room Availability Checking — TCOV-08-010 … 018.
+// F008 Room Availability Checking — TCOV-08-001 … 009.
 //
 // Per the user's directive, each test asserts the behavior that SHOULD exist; where the app
 // doesn't implement it, the test is left to FAIL (red) to surface the gap.
@@ -57,7 +57,7 @@ function bookRoom(page, { id, room_no = 'TST', check_in, check_out }) {
 
 test.describe('F008 Room Availability Checking', () => {
 
-  test('TCOV-08-010 — Verify room does not exist', async ({ page }) => {
+  test('TCOV-08-001 — Verify room does not exist', async ({ page }) => {
     await login(page);
     const resp = await bookRoom(page, { id: 999999, check_in: '2099-01-01', check_out: '2099-01-02' });
     const body = await resp.json();
@@ -65,7 +65,7 @@ test.describe('F008 Room Availability Checking', () => {
     expect(String(body.message)).toContain('Room not found');
   });
 
-  test('TCOV-08-011 — Verify room exists but is not available', async ({ page }) => {
+  test('TCOV-08-002 — Verify room exists but is not available', async ({ page }) => {
     await login(page);
     const bookedId = sql(`SELECT id FROM rooms WHERE status='booked' LIMIT 1`);
     const resp = await bookRoom(page, { id: bookedId, check_in: '2099-01-01', check_out: '2099-01-02' });
@@ -74,7 +74,7 @@ test.describe('F008 Room Availability Checking', () => {
     expect(String(body.message)).toContain('not available');
   });
 
-  test('TCOV-08-012 — Verify invalid check-in date', async ({ page }) => {
+  test('TCOV-08-003 — Verify invalid check-in date', async ({ page }) => {
     // SHOULD: a check-in date in the past is rejected. ACTUAL: no date validation — the booking
     // is created. Fails by design, exposing the missing check-in validation.
     await login(page);
@@ -88,7 +88,7 @@ test.describe('F008 Room Availability Checking', () => {
     }
   });
 
-  test('TCOV-08-013 — Verify invalid check-out date', async ({ page }) => {
+  test('TCOV-08-004 — Verify invalid check-out date', async ({ page }) => {
     // SHOULD: a check-out date before the check-in date is rejected. ACTUAL: duration is taken
     // as an absolute diff (min 1) and the booking is created. Fails by design.
     await login(page);
@@ -102,7 +102,7 @@ test.describe('F008 Room Availability Checking', () => {
     }
   });
 
-  test('TCOV-08-014 — Verify room already booked', async ({ page }) => {
+  test('TCOV-08-005 — Verify room already booked', async ({ page }) => {
     // SHOULD: a room already booked for the requested dates cannot be booked again. ACTUAL: there
     // is no date-range overlap detection, so a second booking for the same room+dates succeeds.
     // Fails by design. (The room is kept 'available' so the status flag doesn't mask the gap.)
@@ -120,12 +120,12 @@ test.describe('F008 Room Availability Checking', () => {
     }
   });
 
-  test('TCOV-08-015 — Verify available room is displayed', async ({ page }) => {
+  test('TCOV-08-006 — Verify available room is displayed', async ({ page }) => {
     await page.goto(ROOMS);
     await expect(page.locator('.rooms-status-badge', { hasText: 'Available' }).first()).toBeVisible();
   });
 
-  test('TCOV-08-016 — Verify invalid room selection is rejected', async ({ page }) => {
+  test('TCOV-08-007 — Verify invalid room selection is rejected', async ({ page }) => {
     await login(page);
     // An invalid room id (0) is rejected before any booking is created.
     const resp = await bookRoom(page, { id: 0, check_in: '2099-01-01', check_out: '2099-01-02' });
@@ -133,7 +133,7 @@ test.describe('F008 Room Availability Checking', () => {
     expect(body.success).toBe(false);
   });
 
-  test('TCOV-08-017 — Verify error message is displayed for invalid availability checking', async ({ page }) => {
+  test('TCOV-08-008 — Verify error message is displayed for invalid availability checking', async ({ page }) => {
     await login(page);
     const resp = await bookRoom(page, { id: 999999, check_in: '2099-01-01', check_out: '2099-01-02' });
     const body = await resp.json();
@@ -142,7 +142,7 @@ test.describe('F008 Room Availability Checking', () => {
     expect(String(body.message || '').length).toBeGreaterThan(0);
   });
 
-  test('TCOV-08-018 — Verify user can proceed to room booking when room is available', async ({ page }) => {
+  test('TCOV-08-009 — Verify user can proceed to room booking when room is available', async ({ page }) => {
     await login(page);
     const room = createRoom();
     try {

@@ -1,11 +1,11 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F009 Room Booking — TCOV-09-024 … 036 for api/create-booking.php.
+// F009 Room Booking — TCOV-09-001 … 013 for api/create-booking.php.
 //
 // This endpoint is properly implemented, so these tests assert its real behavior. Each test that
 // creates a booking uses a throwaway room and cleans it up (the booking reserves the room and
-// inserts an orders row). The rollback test (036) forces the INSERT to fail via a foreign-key
+// inserts an orders row). The rollback test (013) forces the INSERT to fail via a foreign-key
 // violation (the session's user is deleted, leaving orders.user_id dangling).
 
 const BASE = 'http://localhost/Hotel-Annapurna-Web';
@@ -49,7 +49,7 @@ const validForm = (id, room_no, check_in, check_out, price = '1000') => ({
 
 test.describe('F009 Room Booking', () => {
 
-  test('TCOV-09-024 — Room booking is created successfully', async ({ page }) => {
+  test('TCOV-09-001 — Room booking is created successfully', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const room = createRoom();
     try {
@@ -63,7 +63,7 @@ test.describe('F009 Room Booking', () => {
     }
   });
 
-  test('TCOV-09-025 — Reject booking and require login', async ({ page }) => {
+  test('TCOV-09-002 — Reject booking and require login', async ({ page }) => {
     // No login → the API rejects with 401 and require_login.
     const resp = await page.request.post(API, { form: validForm(1, 'x', '2099-01-01', '2099-01-03') });
     expect(resp.status()).toBe(401);
@@ -72,7 +72,7 @@ test.describe('F009 Room Booking', () => {
     expect(body.require_login).toBe(true);
   });
 
-  test('TCOV-09-026 — Reject invalid request method', async ({ page }) => {
+  test('TCOV-09-003 — Reject invalid request method', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const resp = await page.request.get(API);
     expect(resp.status()).toBe(405);
@@ -80,7 +80,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('Invalid request method');
   });
 
-  test('TCOV-09-027 — Reject incomplete booking details', async ({ page }) => {
+  test('TCOV-09-004 — Reject incomplete booking details', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-03');
     delete form.price; // price defaults to 0 → rejected
@@ -90,7 +90,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('Missing required booking information');
   });
 
-  test('TCOV-09-028 — Reject invalid booking type', async ({ page }) => {
+  test('TCOV-09-005 — Reject invalid booking type', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-03');
     form.item_type = 'spaceship';
@@ -100,7 +100,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('Invalid booking type');
   });
 
-  test('TCOV-09-029 — Reject invalid room data format', async ({ page }) => {
+  test('TCOV-09-006 — Reject invalid room data format', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const form = validForm(1, 'x', '2099-01-01', '2099-01-03');
     form.item_data = 'this-is-not-json';
@@ -110,7 +110,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('Invalid item data format');
   });
 
-  test('TCOV-09-030 — Reject booking when room does not exist', async ({ page }) => {
+  test('TCOV-09-007 — Reject booking when room does not exist', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const resp = await page.request.post(API, { form: validForm(999999, 'x', '2099-01-01', '2099-01-03') });
     const body = await resp.json();
@@ -118,7 +118,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('Room not found');
   });
 
-  test('TCOV-09-031 — Reject booking when room status is not available', async ({ page }) => {
+  test('TCOV-09-008 — Reject booking when room status is not available', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const bookedId = sql(`SELECT id FROM rooms WHERE status='booked' LIMIT 1`);
     const resp = await page.request.post(API, { form: validForm(bookedId, 'x', '2099-01-01', '2099-01-03') });
@@ -127,7 +127,7 @@ test.describe('F009 Room Booking', () => {
     expect(String(body.message)).toContain('not available');
   });
 
-  test('TCOV-09-032 — Calculate booking duration correctly', async ({ page }) => {
+  test('TCOV-09-009 — Calculate booking duration correctly', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const room = createRoom();
     try {
@@ -142,7 +142,7 @@ test.describe('F009 Room Booking', () => {
     }
   });
 
-  test('TCOV-09-033 — Calculate total price correctly', async ({ page }) => {
+  test('TCOV-09-010 — Calculate total price correctly', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const room = createRoom();
     try {
@@ -156,7 +156,7 @@ test.describe('F009 Room Booking', () => {
     }
   });
 
-  test('TCOV-09-034 — Generate booking reference successfully', async ({ page }) => {
+  test('TCOV-09-011 — Generate booking reference successfully', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const room = createRoom();
     try {
@@ -170,7 +170,7 @@ test.describe('F009 Room Booking', () => {
     }
   });
 
-  test('TCOV-09-035 — Update room status to reserved after successful booking', async ({ page }) => {
+  test('TCOV-09-012 — Update room status to reserved after successful booking', async ({ page }) => {
     await loginAs(page, CUSTOMER.email, CUSTOMER.password);
     const room = createRoom();
     try {
@@ -183,7 +183,7 @@ test.describe('F009 Room Booking', () => {
     }
   });
 
-  test('TCOV-09-036 — Verify transaction rollback when booking creation fails', async ({ page }) => {
+  test('TCOV-09-013 — Verify transaction rollback when booking creation fails', async ({ page }) => {
     // Force the INSERT to fail via a foreign-key violation: log in as a throwaway user, delete
     // that user (so the session's user_id no longer references a users row), then book. The
     // orders.user_id FK rejects the INSERT → the transaction rolls back: no order, room unchanged.

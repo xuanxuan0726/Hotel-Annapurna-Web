@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-// F003 Session Verification — state-machine transitions (TCOV-03-014 … 021).
+// F003 Session Verification — state-machine transitions (TCOV-03-001 … 008).
 //
 // States: S1 Accessing Protected Page · S2 Checking Session · S3 Viewing Protected Page
 //         S4 Redirecting to Login · S5 Logging Out
@@ -31,7 +31,7 @@ async function loginAsCustomer(page) {
 
 test.describe('F003 Session Verification', () => {
 
-  test('TCOV-03-014 — S1 Accessing Protected Page → S2 Checking Session', async ({ page }) => {
+  test('TCOV-03-001 — S1 Accessing Protected Page → S2 Checking Session', async ({ page }) => {
     // Accessing a protected page is intercepted by the session-verification guard rather
     // than served directly. With no session, the guard routes the request into the check
     // and away from the protected content (here it ends at the login page).
@@ -41,21 +41,21 @@ test.describe('F003 Session Verification', () => {
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-03-015 — S2 Checking Session → S3 Viewing Protected Page (valid session)', async ({ page }) => {
+  test('TCOV-03-002 — S2 Checking Session → S3 Viewing Protected Page (valid session)', async ({ page }) => {
     await loginAsCustomer(page);
     // With a valid session the guard passes and the protected page renders.
     await page.goto(PROFILE_URL);
     await expect(page).toHaveURL(/profile\.php/);
   });
 
-  test('TCOV-03-016 — S2 Checking Session → S4 Redirecting to Login (invalid session)', async ({ page }) => {
+  test('TCOV-03-003 — S2 Checking Session → S4 Redirecting to Login (invalid session)', async ({ page }) => {
     // No session at all → guard redirects to login.
     await page.context().clearCookies();
     await page.goto(PROFILE_URL);
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-03-017 — S2 Checking Session → S4 Redirecting to Login (expired session)', async ({ page }) => {
+  test('TCOV-03-004 — S2 Checking Session → S4 Redirecting to Login (expired session)', async ({ page }) => {
     // Establish a valid session, then expire it (clear the session cookie). The next access
     // is checked, found invalid, and redirected to login.
     await loginAsCustomer(page);
@@ -64,7 +64,7 @@ test.describe('F003 Session Verification', () => {
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-03-018 — S3 Viewing Protected Page → S5 Logging Out', async ({ page }) => {
+  test('TCOV-03-005 — S3 Viewing Protected Page → S5 Logging Out', async ({ page }) => {
     await loginAsCustomer(page);
     await page.goto(PROFILE_URL);
     await expect(page).toHaveURL(/profile\.php/);
@@ -80,7 +80,7 @@ test.describe('F003 Session Verification', () => {
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-03-019 — S3 Viewing Protected Page → S4 Redirecting to Login (session times out)', async ({ page }) => {
+  test('TCOV-03-006 — S3 Viewing Protected Page → S4 Redirecting to Login (session times out)', async ({ page }) => {
     await loginAsCustomer(page);
     await page.goto(PROFILE_URL);
     await expect(page).toHaveURL(/profile\.php/); // S3: viewing the page
@@ -90,7 +90,7 @@ test.describe('F003 Session Verification', () => {
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-03-020 — S4 Redirecting to Login → S3 Viewing Protected Page (login succeeds)', async ({ page }) => {
+  test('TCOV-03-007 — S4 Redirecting to Login → S3 Viewing Protected Page (login succeeds)', async ({ page }) => {
     // Start unauthenticated: accessing the protected page redirects to login (S4).
     await page.context().clearCookies();
     await page.goto(PROFILE_URL);
@@ -105,7 +105,7 @@ test.describe('F003 Session Verification', () => {
     await expect(page).toHaveURL(/profile\.php/);
   });
 
-  test('TCOV-03-021 — S4 Redirecting to Login stays at S4 (login fails)', async ({ page }) => {
+  test('TCOV-03-008 — S4 Redirecting to Login stays at S4 (login fails)', async ({ page }) => {
     await page.context().clearCookies();
     await page.goto(PROFILE_URL);
     await expect(page).toHaveURL(/login\.php/);

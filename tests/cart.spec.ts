@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F007 Add Food to Cart — TCOV-07-024 … 031.
+// F007 Add Food to Cart — TCOV-07-001 … 008.
 //
 // Per the user's directive, each test asserts the behavior that SHOULD exist. Where the app
 // does not implement it, the test is left to FAIL (red) to surface the gap — no test.fail()
@@ -33,7 +33,7 @@ async function seedCart(page, food) {
 
 test.describe('F007 Add Food to Cart', () => {
 
-  test('TCOV-07-024 — Add available food item to cart successfully', async ({ page }) => {
+  test('TCOV-07-001 — Add available food item to cart successfully', async ({ page }) => {
     page.on('dialog', (d) => d.accept()); // the add handler alert()s
     await page.goto(MENU);
     const cb = firstVegCheckbox(page);
@@ -44,7 +44,7 @@ test.describe('F007 Add Food to Cart', () => {
     await expect(page.locator('.cart-item-title', { hasText: name })).toBeVisible();
   });
 
-  test('TCOV-07-025 — Redirect user to login or display login required message', async ({ page }) => {
+  test('TCOV-07-002 — Redirect user to login or display login required message', async ({ page }) => {
     // SHOULD: adding to cart while logged out routes the user to login (or shows a login-required
     // message). ACTUAL: the food add is pure localStorage with no login gate → it goes to cart.php.
     // This test fails by design, exposing the missing login requirement.
@@ -57,7 +57,7 @@ test.describe('F007 Add Food to Cart', () => {
     expect(page.url()).toContain('login.php');
   });
 
-  test('TCOV-07-026 — Prevent unavailable item from being added', async ({ page }) => {
+  test('TCOV-07-003 — Prevent unavailable item from being added', async ({ page }) => {
     // SHOULD: an unavailable food item (its available_days excludes today) cannot be added.
     // ACTUAL: food add ignores availability entirely → the item is added. Fails by design.
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -84,7 +84,7 @@ test.describe('F007 Add Food to Cart', () => {
     }
   });
 
-  test('TCOV-07-027 — Verify unavailable food item cannot be added to cart', async ({ page }) => {
+  test('TCOV-07-004 — Verify unavailable food item cannot be added to cart', async ({ page }) => {
     // SHOULD: after attempting to add an unavailable item, the cart does not contain it.
     // ACTUAL: it is present. Fails by design.
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -107,7 +107,7 @@ test.describe('F007 Add Food to Cart', () => {
     }
   });
 
-  test('TCOV-07-028 — Verify existing food item in cart increases quantity instead of creating duplicate item', async ({ page }) => {
+  test('TCOV-07-005 — Verify existing food item in cart increases quantity instead of creating duplicate item', async ({ page }) => {
     page.on('dialog', (d) => d.accept());
     // First add.
     await page.goto(MENU);
@@ -129,7 +129,7 @@ test.describe('F007 Add Food to Cart', () => {
     expect(entries[0].quantity).toBe(2);
   });
 
-  test('TCOV-07-029 — Verify invalid quantity is rejected', async ({ page }) => {
+  test('TCOV-07-006 — Verify invalid quantity is rejected', async ({ page }) => {
     await seedCart(page, [{ id: 99999, name: 'TestFood', price: 100, quantity: 1, type: 'food' }]);
     const qty = page.locator('.cart-qty-input').first();
     await expect(qty).toHaveValue('1');
@@ -138,7 +138,7 @@ test.describe('F007 Add Food to Cart', () => {
     await expect(qty).toHaveValue('1');
   });
 
-  test('TCOV-07-030 — Verify cart total is recalculated after item is added', async ({ page }) => {
+  test('TCOV-07-007 — Verify cart total is recalculated after item is added', async ({ page }) => {
     await seedCart(page, [{ id: 99999, name: 'TestFood', price: 100, quantity: 1, type: 'food' }]);
     await expect(page.locator('#subtotalValue')).toHaveText('Rs. 100.00');
     // Increasing quantity adds another unit — total recalculates.
@@ -146,7 +146,7 @@ test.describe('F007 Add Food to Cart', () => {
     await expect(page.locator('#subtotalValue')).toHaveText('Rs. 200.00');
   });
 
-  test('TCOV-07-031 — Verify database or server error displays error message and cart remains unchanged', async ({ page }) => {
+  test('TCOV-07-008 — Verify database or server error displays error message and cart remains unchanged', async ({ page }) => {
     const uid = sql(`SELECT id FROM users WHERE email='yangenna20@gmail.com'`);
     // Log in so page.request carries the session cookie to the authenticated cart API.
     await page.goto(`${BASE}/login.php`);

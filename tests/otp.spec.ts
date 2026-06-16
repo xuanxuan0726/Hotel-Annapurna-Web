@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F004 OTP Account Verification — decision-table coverage (TCON-04-010 … 019) for
+// F004 OTP Account Verification — decision-table coverage (TCOV-04-001 … 010) for
 // verify-register.php.
 //
 // The OTP is generated server-side, stored in MySQL (registration_otps) and emailed
@@ -87,7 +87,7 @@ test.describe('F004 OTP Account Verification', () => {
   test.describe.configure({ retries: 1 });
 
 
-  test('TCON-04-010 — OTP Entered', async ({ page }) => {
+  test('TCOV-04-001 — OTP Entered', async ({ page }) => {
     await registerFresh(page);
     const code = '123456';
     const boxes = page.locator('.otp-input');
@@ -99,14 +99,14 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(page.locator('.alert')).toBeVisible();
   });
 
-  test('TCON-04-011 — OTP Matches Email', async ({ page }) => {
+  test('TCOV-04-002 — OTP Matches Email', async ({ page }) => {
     const email = await registerFresh(page);
     const otp = getOtp(email);
     await enterOtp(page, otp);
     await expect(successAlert(page)).toContainText('Registration successful');
   });
 
-  test('TCON-04-012 — OTP Not Expired', async ({ page }) => {
+  test('TCOV-04-003 — OTP Not Expired', async ({ page }) => {
     const email = await registerFresh(page);
     // A freshly issued OTP is unexpired, so the verify query (which requires expiry > now)
     // matches and the account is verified. Success here proves the not-expired condition.
@@ -115,7 +115,7 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(successAlert(page)).toContainText('Registration successful');
   });
 
-  test('TCON-04-013 — OTP Not Used', async ({ page }) => {
+  test('TCOV-04-004 — OTP Not Used', async ({ page }) => {
     const email = await registerFresh(page);
     const otp = getOtp(email);
     // Mark it used; the verify query requires used=0, so the (now-used) OTP is rejected.
@@ -124,7 +124,7 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(errorAlert(page)).toContainText('Invalid OTP! Please check and try again.');
   });
 
-  test('TCON-04-014 — Resend Cooldown Passed', async ({ page }) => {
+  test('TCOV-04-005 — Resend Cooldown Passed', async ({ page }) => {
     // Budget for a possible registration send-retry plus the full 61s cooldown wait.
     test.setTimeout(150000);
     await registerFresh(page);
@@ -134,7 +134,7 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(successAlert(page)).toContainText('New OTP has been sent to your email!');
   });
 
-  test('TCON-04-015 — Verify Account', async ({ page }) => {
+  test('TCOV-04-006 — Verify Account', async ({ page }) => {
     const email = await registerFresh(page);
     expect(countUsers(email)).toBe(0); // no account yet
     const otp = getOtp(email);
@@ -145,7 +145,7 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(page).toHaveURL(/\/index\.php/, { timeout: 10000 });
   });
 
-  test('TCON-04-016 — Display Invalid OTP Message', async ({ page }) => {
+  test('TCOV-04-007 — Display Invalid OTP Message', async ({ page }) => {
     const email = await registerFresh(page);
     const real = getOtp(email);
     // A code that is guaranteed not to match the real OTP.
@@ -154,7 +154,7 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(errorAlert(page)).toContainText('Invalid OTP! Please check and try again.');
   });
 
-  test('TCON-04-017 — Display Expired OTP Message', async ({ page }) => {
+  test('TCOV-04-008 — Display Expired OTP Message', async ({ page }) => {
     const email = await registerFresh(page);
     const otp = getOtp(email);
     // Push the OTP's expiry into the past, then submit the (correct but expired) code.
@@ -163,14 +163,14 @@ test.describe('F004 OTP Account Verification', () => {
     await expect(errorAlert(page)).toContainText('OTP has expired! Please request a new OTP.');
   });
 
-  test('TCON-04-018 — Display Resend Cooldown Message', async ({ page }) => {
+  test('TCOV-04-009 — Display Resend Cooldown Message', async ({ page }) => {
     await registerFresh(page);
     // Resend immediately, while the 60s cooldown is still active.
     await clickResend(page);
     await expect(errorAlert(page)).toContainText('before requesting a new OTP');
   });
 
-  test('TCON-04-019 — Send New OTP Email', async ({ page }) => {
+  test('TCOV-04-010 — Send New OTP Email', async ({ page }) => {
     // Budget for a possible registration send-retry plus the full 61s cooldown wait.
     test.setTimeout(150000);
     const email = await registerFresh(page);

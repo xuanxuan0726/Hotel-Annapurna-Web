@@ -1,11 +1,11 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F014 Payment Processing — TCOV-14-010 … 017 for api/confirm-booking.php (+ eSewa flow).
+// F014 Payment Processing — TCOV-14-001 … 008 for api/confirm-booking.php (+ eSewa flow).
 //
 // Per the user's directive, each test asserts the behavior that SHOULD exist; where the app
 // doesn't implement it, the test is left to FAIL (red). The user also confirmed eSewa is NOT set
-// up, so the eSewa tests (015, 016) are expected to fail.
+// up, so the eSewa tests (006, 007) are expected to fail.
 //
 // confirm-booking.php validates login, method, booking ownership, and payment method/status, then
 // sets payment_status (as passed) and status='confirmed'. It does NOT validate the payment amount.
@@ -42,14 +42,14 @@ const confirm = (page, form) => page.request.post(CONFIRM, { form });
 
 test.describe('F014 Payment Processing', () => {
 
-  test('TCOV-14-010 — Verify payment is rejected when user is not logged in', async ({ page }) => {
+  test('TCOV-14-001 — Verify payment is rejected when user is not logged in', async ({ page }) => {
     const resp = await confirm(page, { booking_id: '1', payment_method: 'cash', payment_status: 'pending' });
     expect(resp.status()).toBe(401);
     const body = await resp.json();
     expect(body.success).toBe(false);
   });
 
-  test('TCOV-14-011 — Verify payment is rejected when order does not exist', async ({ page }) => {
+  test('TCOV-14-002 — Verify payment is rejected when order does not exist', async ({ page }) => {
     await login(page);
     const resp = await confirm(page, { booking_id: '999999', payment_method: 'cash', payment_status: 'pending' });
     const body = await resp.json();
@@ -57,7 +57,7 @@ test.describe('F014 Payment Processing', () => {
     expect(String(body.message)).toContain('Booking not found');
   });
 
-  test('TCOV-14-012 — Verify payment is rejected when payment amount is invalid', async ({ page }) => {
+  test('TCOV-14-003 — Verify payment is rejected when payment amount is invalid', async ({ page }) => {
     // SHOULD: an invalid payment amount is rejected. ACTUAL: confirm-booking.php has no amount
     // validation (it doesn't even read an amount), so the booking is confirmed. Fails by design.
     await login(page);
@@ -71,7 +71,7 @@ test.describe('F014 Payment Processing', () => {
     }
   });
 
-  test('TCOV-14-013 — Verify payment is rejected when payment method is not selected', async ({ page }) => {
+  test('TCOV-14-004 — Verify payment is rejected when payment method is not selected', async ({ page }) => {
     await login(page);
     const resp = await confirm(page, { booking_id: '999999', payment_method: '', payment_status: 'pending' });
     const body = await resp.json();
@@ -79,7 +79,7 @@ test.describe('F014 Payment Processing', () => {
     expect(String(body.message)).toContain('Payment method is required');
   });
 
-  test('TCOV-14-014 — Verify cash payment keeps payment status as pending', async ({ page }) => {
+  test('TCOV-14-005 — Verify cash payment keeps payment status as pending', async ({ page }) => {
     await login(page);
     const id = createOrder();
     try {
@@ -93,10 +93,10 @@ test.describe('F014 Payment Processing', () => {
     }
   });
 
-  test('TCOV-14-015 — Verify eSewa payment redirects user to payment gateway', async ({ page }) => {
+  test('TCOV-14-006 — Verify eSewa payment redirects user to payment gateway', async ({ page }) => {
     // The eSewa form really does submit to eSewa's RC sandbox, so the redirect to the gateway
     // works (passes). Note: this is network-dependent — it requires rc-epay.esewa.com.np to be
-    // reachable. (Completing the payment is what's not configured — see 016.)
+    // reachable. (Completing the payment is what's not configured — see 007.)
     await login(page);
     const id = createOrder();
     try {
@@ -109,7 +109,7 @@ test.describe('F014 Payment Processing', () => {
     }
   });
 
-  test('TCOV-14-016 — Verify successful eSewa payment updates payment status', async ({ page }) => {
+  test('TCOV-14-007 — Verify successful eSewa payment updates payment status', async ({ page }) => {
     // eSewa is NOT set up, so a successful eSewa payment cannot occur and the order stays pending.
     // Fails by design (per the user).
     await login(page);
@@ -122,7 +122,7 @@ test.describe('F014 Payment Processing', () => {
     }
   });
 
-  test('TCOV-14-017 — Verify successful Stripe payment updates payment status', async ({ page }) => {
+  test('TCOV-14-008 — Verify successful Stripe payment updates payment status', async ({ page }) => {
     await login(page);
     const id = createOrder();
     try {

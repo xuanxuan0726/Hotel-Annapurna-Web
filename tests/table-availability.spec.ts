@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-// F010 Table Availability Checking — TCOV-10-010 … 018.
+// F010 Table Availability Checking — TCOV-10-001 … 009.
 //
 // Per the user's directive, each test asserts the behavior that SHOULD exist; where the app
 // doesn't implement it, the test is left to FAIL (red) to surface the gap.
@@ -56,7 +56,7 @@ function bookTable(page, { id, table_no = 'TST', check_in, check_out, reservatio
 
 test.describe('F010 Table Availability Checking', () => {
 
-  test('TCOV-10-010 — Verify table does not exist', async ({ page }) => {
+  test('TCOV-10-001 — Verify table does not exist', async ({ page }) => {
     await login(page);
     const resp = await bookTable(page, { id: 999999, check_in: '2099-01-01', check_out: '2099-01-02' });
     const body = await resp.json();
@@ -64,7 +64,7 @@ test.describe('F010 Table Availability Checking', () => {
     expect(String(body.message)).toContain('Table not found');
   });
 
-  test('TCOV-10-011 — Verify table exists but is not available', async ({ page }) => {
+  test('TCOV-10-002 — Verify table exists but is not available', async ({ page }) => {
     await login(page);
     const bookedId = sql(`SELECT id FROM tables WHERE booking_status='booked' LIMIT 1`);
     const resp = await bookTable(page, { id: bookedId, check_in: '2099-01-01', check_out: '2099-01-02' });
@@ -73,7 +73,7 @@ test.describe('F010 Table Availability Checking', () => {
     expect(String(body.message)).toContain('not available');
   });
 
-  test('TCOV-10-012 — Verify invalid reservation date', async ({ page }) => {
+  test('TCOV-10-003 — Verify invalid reservation date', async ({ page }) => {
     // SHOULD: a reservation date in the past is rejected. ACTUAL: no date validation — the
     // reservation is created. Fails by design.
     await login(page);
@@ -87,7 +87,7 @@ test.describe('F010 Table Availability Checking', () => {
     }
   });
 
-  test('TCOV-10-013 — Verify invalid reservation time', async ({ page }) => {
+  test('TCOV-10-004 — Verify invalid reservation time', async ({ page }) => {
     // SHOULD: an invalid reservation time is rejected. ACTUAL: the booking API has no concept of
     // reservation time at all (it is ignored), so the reservation is created. Fails by design.
     await login(page);
@@ -101,7 +101,7 @@ test.describe('F010 Table Availability Checking', () => {
     }
   });
 
-  test('TCOV-10-014 — Verify table already reserved', async ({ page }) => {
+  test('TCOV-10-005 — Verify table already reserved', async ({ page }) => {
     // SHOULD: a table already reserved for the requested date/time cannot be reserved again.
     // ACTUAL: no overlap detection, so a second reservation for the same table+date succeeds.
     // Fails by design. (The table is kept 'available' so the status flag doesn't mask the gap.)
@@ -118,19 +118,19 @@ test.describe('F010 Table Availability Checking', () => {
     }
   });
 
-  test('TCOV-10-015 — Verify available table is displayed', async ({ page }) => {
+  test('TCOV-10-006 — Verify available table is displayed', async ({ page }) => {
     await page.goto(TABLES);
     await expect(page.locator('.tables-status-badge', { hasText: 'Available' }).first()).toBeVisible();
   });
 
-  test('TCOV-10-016 — Verify invalid table selection is rejected', async ({ page }) => {
+  test('TCOV-10-007 — Verify invalid table selection is rejected', async ({ page }) => {
     await login(page);
     const resp = await bookTable(page, { id: 0, check_in: '2099-01-01', check_out: '2099-01-02' });
     const body = await resp.json();
     expect(body.success).toBe(false);
   });
 
-  test('TCOV-10-017 — Verify error message is displayed for invalid table availability checking', async ({ page }) => {
+  test('TCOV-10-008 — Verify error message is displayed for invalid table availability checking', async ({ page }) => {
     await login(page);
     const resp = await bookTable(page, { id: 999999, check_in: '2099-01-01', check_out: '2099-01-02' });
     const body = await resp.json();
@@ -138,7 +138,7 @@ test.describe('F010 Table Availability Checking', () => {
     expect(String(body.message || '').length).toBeGreaterThan(0);
   });
 
-  test('TCOV-10-018 — Verify user can proceed to table reservation when table is available', async ({ page }) => {
+  test('TCOV-10-009 — Verify user can proceed to table reservation when table is available', async ({ page }) => {
     await login(page);
     const table = createTable();
     try {
