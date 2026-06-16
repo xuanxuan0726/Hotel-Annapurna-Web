@@ -51,7 +51,7 @@ test.describe('Hotel Annapurna Login Verification', () => {
 });
 
 
-// F002 User Login — formal test-case coverage (TCOV-02-010 … 016).
+// F002 User Login — formal test-case coverage (TCOV-02-001 … 007).
 // Validation is HTML5 `required` on #email/#password + server-side PHP in login-handler.php.
 // Server errors redirect back to login.php and render in the error box; success redirects
 // by role (admin -> admin/index.php, everyone else -> index.php).
@@ -68,7 +68,7 @@ test.describe('F002 User Login', () => {
   // Native browser blocking → HTML5 `required` stops submission before the server.
   // ---------------------------------------------------------------------------
 
-  test('TCOV-02-010 — Verify email field is empty', async ({ page }) => {
+  test('TCOV-02-001 — Verify email field is empty', async ({ page }) => {
     await page.goto(LOGIN_URL);
     // Leave #email empty; fill password so only the email blocks submission.
     await page.fill('#password', 'somepassword');
@@ -78,7 +78,7 @@ test.describe('F002 User Login', () => {
     await expect(page).toHaveURL(/login\.php/);
   });
 
-  test('TCOV-02-011 — Verify password field is empty', async ({ page }) => {
+  test('TCOV-02-002 — Verify password field is empty', async ({ page }) => {
     await page.goto(LOGIN_URL);
     await page.fill('#email', CUSTOMER.email);
     // Leave #password empty.
@@ -92,7 +92,7 @@ test.describe('F002 User Login', () => {
   // Server-side rejection → error box populated, stays on login.php.
   // ---------------------------------------------------------------------------
 
-  test('TCOV-02-012 — Verify account does not exist', async ({ page }) => {
+  test('TCOV-02-003 — Verify account does not exist', async ({ page }) => {
     await page.goto(LOGIN_URL);
     // Unique non-existent (but valid-format) email so it always misses the users table.
     await page.fill('#email', `nonexistent_${Date.now()}@example.com`);
@@ -102,7 +102,7 @@ test.describe('F002 User Login', () => {
     await expect(errorBox(page)).toContainText('Invalid email or password');
   });
 
-  test('TCOV-02-013 — Verify incorrect password', async ({ page }) => {
+  test('TCOV-02-004 — Verify incorrect password', async ({ page }) => {
     await page.goto(LOGIN_URL);
     await page.fill('#email', CUSTOMER.email);
     await page.fill('#password', 'wrongpassword');
@@ -115,7 +115,7 @@ test.describe('F002 User Login', () => {
   // Successful login → role-based redirect.
   // ---------------------------------------------------------------------------
 
-  test('TCOV-02-015 — Verify admin login redirects to admin dashboard', async ({ page }) => {
+  test('TCOV-02-006 — Verify admin login redirects to admin dashboard', async ({ page }) => {
     // Admins authenticate through the dedicated admin login page, which sets the
     // admin session ($_SESSION['admin_logged_in']) the dashboard guards on. (The main
     // login.php redirects admins to admin/index.php but does NOT set that flag, so the
@@ -127,7 +127,7 @@ test.describe('F002 User Login', () => {
     await expect(page).toHaveURL(/\/admin\/index\.php/);
   });
 
-  test('TCOV-02-016 — Verify customer login redirects to customer homepage', async ({ page }) => {
+  test('TCOV-02-007 — Verify customer login redirects to customer homepage', async ({ page }) => {
     await page.goto(LOGIN_URL);
     await page.fill('#email', CUSTOMER.email);
     await page.fill('#password', CUSTOMER.password);

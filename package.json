@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "> ⚠️ **Important:** These are FREE hosting URLs with limitations. **Not recommended for production data.**\r > For testing: Use the credentials below or register with a **Gmail account only** (Gmail SMTP is configured)",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:selenium": "mocha --config selenium/.mocharc.json"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xuanxuan0726/Hotel-Annapurna-Web.git"
@@ -18,6 +20,8 @@
   "homepage": "https://github.com/xuanxuan0726/Hotel-Annapurna-Web#readme",
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.2"
+    "@types/node": "^25.9.2",
+    "mocha": "^11.7.6",
+    "selenium-webdriver": "^4.44.0"
   }
 }
